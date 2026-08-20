@@ -1,15 +1,15 @@
 # SiencyWinOS Loader - Stable Branch
-# Command: irm https://raw.githubusercontent.com/USERNAME/SiencyWinOS/main/loader.ps1 | iex
+# Command: irm https://raw.githubusercontent.com/adit-kusuma/SiencyWinOS/main/loader.ps1 | iex
 
 if (-not ([Security.Principal.WindowsPrincipal][Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)) {
-    Start-Process PowerShell -ArgumentList "-NoProfile -ExecutionPolicy Bypass -Command `"irm https://raw.githubusercontent.com/USERNAME/SiencyWinOS/main/loader.ps1 | iex`"" -Verb RunAs
+    Start-Process PowerShell -ArgumentList "-NoProfile -ExecutionPolicy Bypass -Command `"irm https://raw.githubusercontent.com/adit-kusuma/SiencyWinOS/main/loader.ps1 | iex`"" -Verb RunAs
     exit
 }
 
 $ErrorActionPreference = "SilentlyContinue"
 Set-ExecutionPolicy -ExecutionPolicy Bypass -Scope Process -Force
 
-$base = "https://raw.githubusercontent.com/USERNAME/SiencyWinOS/main"
+$base = "https://raw.githubusercontent.com/adit-kusuma/SiencyWinOS/main"
 $tmp  = "$env:TEMP\SiencyWinOS"
 
 Clear-Host
