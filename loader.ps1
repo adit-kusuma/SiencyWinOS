@@ -79,4 +79,18 @@ Start-Sleep -Milliseconds 500
 . "$tmp\src\ui\Theme.ps1"
 . "$tmp\src\ui\MainWindow.ps1"
 
-Start-SiencyWinOS
+$ps1 = "$tmp\src\ui\MainWindow.ps1"
+powershell -NoProfile -ExecutionPolicy Bypass -Command "
+    . '$tmp\src\utils\Logger.ps1'
+    . '$tmp\src\utils\Helpers.ps1'
+    . '$tmp\src\modules\Optimization.ps1'
+    . '$tmp\src\modules\Gaming.ps1'
+    . '$tmp\src\modules\Privacy.ps1'
+    . '$tmp\src\modules\Network.ps1'
+    . '$tmp\src\modules\System.ps1'
+    . '$tmp\src\modules\Advanced.ps1'
+    . '$tmp\src\modules\ProcessManager.ps1'
+    . '$tmp\src\ui\Theme.ps1'
+    . '$tmp\src\ui\MainWindow.ps1'
+    Start-SiencyWinOS
+"
