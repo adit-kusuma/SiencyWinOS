@@ -56,13 +56,9 @@ foreach ($file in $files) {
     }
 }
 
-# Build the launch script
+# Build launch.ps1
 $launch = @"
 Set-ExecutionPolicy -ExecutionPolicy Bypass -Scope Process -Force
-Add-Type -AssemblyName PresentationFramework
-Add-Type -AssemblyName PresentationCore
-Add-Type -AssemblyName WindowsBase
-
 `$tmp = '$tmp'
 . "`$tmp\src\utils\Logger.ps1"
 . "`$tmp\src\utils\Helpers.ps1"
@@ -81,17 +77,31 @@ Start-SiencyWinOS
 $launchPath = "$tmp\launch.ps1"
 $launch | Out-File -FilePath $launchPath -Encoding UTF8 -Force
 
+# Build shortcut on desktop
+$shortcutPath = "$env:USERPROFILE\Desktop\SiencyWinOS.lnk"
+$shell = New-Object -ComObject WScript.Shell
+$shortcut = $shell.CreateShortcut($shortcutPath)
+$shortcut.TargetPath = "powershell.exe"
+$shortcut.Arguments = "-NoProfile -ExecutionPolicy Bypass -STA -File `"$launchPath`""
+$shortcut.WorkingDirectory = $tmp
+$shortcut.Description = "SiencyWinOS Optimizer"
+$shortcut.Save()
+
+# Also create a .bat launcher on desktop
+$batPath = "$env:USERPROFILE\Desktop\SiencyWinOS.bat"
+@"
+@echo off
+powershell.exe -NoProfile -ExecutionPolicy Bypass -STA -File "$launchPath"
+"@ | Out-File -FilePath $batPath -Encoding ASCII -Force
+
 Write-Host ""
-Write-Host "  [OK] All modules downloaded successfully!" -ForegroundColor Green
+Write-Host "  [OK] All 14 modules downloaded!" -ForegroundColor Green
 Write-Host ""
-Write-Host "  Launching SiencyWinOS GUI..." -ForegroundColor Green
+Write-Host "  ============================================" -ForegroundColor Yellow
+Write-Host "   LAUNCHING NOW..." -ForegroundColor Yellow  
+Write-Host "  ============================================" -ForegroundColor Yellow
 Write-Host ""
 
-# Key fix: use powershell.exe with -STA flag as a new process with -File
-# This is the ONLY way WPF works - must be file-based, STA, separate process
-$psi = New-Object System.Diagnostics.ProcessStartInfo
-$psi.FileName = "powershell.exe"
-$psi.Arguments = "-NoProfile -ExecutionPolicy Bypass -STA -NonInteractive -File `"$launchPath`""
-$psi.UseShellExecute = $true
-$psi.Verb = "runas"
-[System.Diagnostics.Process]::Start($psi) | Out-Null
+# Launch directly via cmd.exe which properly handles STA
+$cmdArgs = "/c powershell.exe -NoProfile -ExecutionPolicy Bypass -STA -File `"$launchPath`""
+Start-Process "cmd.exe" -ArgumentList $cmdArgs -Verb RunAs -WindowStyle Hidden
