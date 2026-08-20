@@ -1,0 +1,16 @@
+{
+  "name": "Dark",
+  "BG": "#0F0F0F",
+  "BGSecondary": "#1A1A1A",
+  "BGCard": "#161616",
+  "Border": "#2A2A2A",
+  "Accent": "#00CC66",
+  "AccentHover": "#00FF88",
+  "TextPrimary": "#EEEEEE",
+  "TextSecondary": "#888888",
+  "LogBG": "#0A0A0A",
+  "LogText": "#00CC66",
+  "Warning": "#FF8800",
+  "Danger": "#FF4444",
+  "Info": "#4488FF"
+}

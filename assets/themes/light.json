@@ -1,0 +1,16 @@
+{
+  "name": "Light",
+  "BG": "#F5F5F5",
+  "BGSecondary": "#FFFFFF",
+  "BGCard": "#FAFAFA",
+  "Border": "#DDDDDD",
+  "Accent": "#007A3D",
+  "AccentHover": "#009A4D",
+  "TextPrimary": "#111111",
+  "TextSecondary": "#666666",
+  "LogBG": "#F0F0F0",
+  "LogText": "#007A3D",
+  "Warning": "#CC6600",
+  "Danger": "#CC2222",
+  "Info": "#2255CC"
+}

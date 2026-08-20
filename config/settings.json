@@ -1,0 +1,9 @@
+{
+  "version": "2.0",
+  "theme": "dark",
+  "accentColor": "#00CC66",
+  "fontFamily": "Segoe UI",
+  "logEnabled": true,
+  "gamingLoopInterval": 10,
+  "autoRestorePoint": true
+}
