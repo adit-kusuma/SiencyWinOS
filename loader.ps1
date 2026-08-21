@@ -1,11 +1,6 @@
 # SiencyWinOS Loader - Stable Branch
 # Command: irm https://raw.githubusercontent.com/adit-kusuma/SiencyWinOS/main/loader.ps1 | iex
 
-if (-not ([Security.Principal.WindowsPrincipal][Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)) {
-    Start-Process PowerShell -ArgumentList "-NoProfile -ExecutionPolicy Bypass -Command `"irm https://raw.githubusercontent.com/adit-kusuma/SiencyWinOS/main/loader.ps1 | iex`"" -Verb RunAs
-    exit
-}
-
 $ErrorActionPreference = "SilentlyContinue"
 Set-ExecutionPolicy -ExecutionPolicy Bypass -Scope Process -Force
 
@@ -15,17 +10,17 @@ $tmp  = "$env:TEMP\SiencyWinOS"
 Clear-Host
 Write-Host ""
 Write-Host "  ============================================" -ForegroundColor Green
-Write-Host "       SiencyWinOS Optimizer  v2.0" -ForegroundColor Green
-Write-Host "       Stable Branch" -ForegroundColor DarkGreen
+Write-Host "       SiencyWinOS Optimizer  v2.0"           -ForegroundColor Green
+Write-Host "       Stable Branch"                          -ForegroundColor DarkGreen
 Write-Host "  ============================================" -ForegroundColor Green
 Write-Host ""
 
 if (Test-Path $tmp) { Remove-Item $tmp -Recurse -Force }
-New-Item -ItemType Directory -Path "$tmp\src\modules" -Force | Out-Null
-New-Item -ItemType Directory -Path "$tmp\src\ui"      -Force | Out-Null
-New-Item -ItemType Directory -Path "$tmp\src\utils"   -Force | Out-Null
+New-Item -ItemType Directory -Path "$tmp\src\modules"   -Force | Out-Null
+New-Item -ItemType Directory -Path "$tmp\src\ui"        -Force | Out-Null
+New-Item -ItemType Directory -Path "$tmp\src\utils"     -Force | Out-Null
 New-Item -ItemType Directory -Path "$tmp\assets\themes" -Force | Out-Null
-New-Item -ItemType Directory -Path "$tmp\config"      -Force | Out-Null
+New-Item -ItemType Directory -Path "$tmp\config"        -Force | Out-Null
 
 $files = @(
     "src/utils/Logger.ps1",
@@ -56,27 +51,38 @@ foreach ($file in $files) {
         Invoke-WebRequest -Uri $url -OutFile $dest -UseBasicParsing -ErrorAction Stop
     } catch {
         Write-Host "  [ERR] Failed: $name" -ForegroundColor Red
-        Write-Host "  Check that your GitHub repo is public." -ForegroundColor Yellow
         pause
         exit
     }
 }
 
-Write-Host ""
-Write-Host "  [OK] All modules loaded. Launching GUI..." -ForegroundColor Green
-Write-Host ""
-Start-Sleep -Milliseconds 500
+# Write launch.ps1
+$launch = @"
+`$ErrorActionPreference = 'Continue'
+Set-ExecutionPolicy -ExecutionPolicy Bypass -Scope Process -Force
+`$tmp = '$tmp'
+try { . "`$tmp\src\utils\Logger.ps1" }       catch { Write-Host "ERR Logger: `$_" -ForegroundColor Red }
+try { . "`$tmp\src\utils\Helpers.ps1" }      catch { Write-Host "ERR Helpers: `$_" -ForegroundColor Red }
+try { . "`$tmp\src\modules\Optimization.ps1" } catch { Write-Host "ERR Opt: `$_" -ForegroundColor Red }
+try { . "`$tmp\src\modules\Gaming.ps1" }     catch { Write-Host "ERR Gaming: `$_" -ForegroundColor Red }
+try { . "`$tmp\src\modules\Privacy.ps1" }    catch { Write-Host "ERR Privacy: `$_" -ForegroundColor Red }
+try { . "`$tmp\src\modules\Network.ps1" }    catch { Write-Host "ERR Network: `$_" -ForegroundColor Red }
+try { . "`$tmp\src\modules\System.ps1" }     catch { Write-Host "ERR System: `$_" -ForegroundColor Red }
+try { . "`$tmp\src\modules\Advanced.ps1" }   catch { Write-Host "ERR Advanced: `$_" -ForegroundColor Red }
+try { . "`$tmp\src\modules\ProcessManager.ps1" } catch { Write-Host "ERR ProcMgr: `$_" -ForegroundColor Red }
+try { . "`$tmp\src\ui\Theme.ps1" }           catch { Write-Host "ERR Theme: `$_" -ForegroundColor Red }
+try { . "`$tmp\src\ui\MainWindow.ps1" }      catch { Write-Host "ERR MainWindow: `$_" -ForegroundColor Red }
+try { Start-SiencyWinOS }                    catch { Write-Host "ERR Launch: `$_" -ForegroundColor Red; Read-Host "Press Enter to exit" }
+"@
 
-. "$tmp\src\utils\Logger.ps1"
-. "$tmp\src\utils\Helpers.ps1"
-. "$tmp\src\modules\Optimization.ps1"
-. "$tmp\src\modules\Gaming.ps1"
-. "$tmp\src\modules\Privacy.ps1"
-. "$tmp\src\modules\Network.ps1"
-. "$tmp\src\modules\System.ps1"
-. "$tmp\src\modules\Advanced.ps1"
-. "$tmp\src\modules\ProcessManager.ps1"
-. "$tmp\src\ui\Theme.ps1"
-. "$tmp\src\ui\MainWindow.ps1"
+$launchPath = "$tmp\launch.ps1"
+$launch | Out-File -FilePath $launchPath -Encoding UTF8 -Force
 
-Start-SiencyWinOS
+Write-Host ""
+Write-Host "  [OK] All 14 modules downloaded!" -ForegroundColor Green
+Write-Host "  Launching GUI via STA process..." -ForegroundColor Green
+Write-Host ""
+
+Start-Process powershell.exe `
+    -ArgumentList "-NoProfile -ExecutionPolicy Bypass -STA -File `"$launchPath`"" `
+    -Verb RunAs
