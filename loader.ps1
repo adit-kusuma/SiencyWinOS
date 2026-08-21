@@ -32,6 +32,9 @@ $files = @(
     "src/modules/System.ps1",
     "src/modules/Advanced.ps1",
     "src/modules/ProcessManager.ps1",
+    "src/modules/Security.ps1",
+    "src/modules/Repair.ps1",
+    "src/modules/Monitor.ps1",
     "src/ui/Theme.ps1",
     "src/ui/MainWindow.ps1",
     "config/settings.json",
@@ -51,38 +54,45 @@ foreach ($file in $files) {
         Invoke-WebRequest -Uri $url -OutFile $dest -UseBasicParsing -ErrorAction Stop
     } catch {
         Write-Host "  [ERR] Failed: $name" -ForegroundColor Red
-        pause
-        exit
+        pause; exit
     }
 }
 
-# Write launch.ps1
 $launch = @"
 `$ErrorActionPreference = 'Continue'
 Set-ExecutionPolicy -ExecutionPolicy Bypass -Scope Process -Force
 `$tmp = '$tmp'
-try { . "`$tmp\src\utils\Logger.ps1" }       catch { Write-Host "ERR Logger: `$_" -ForegroundColor Red }
-try { . "`$tmp\src\utils\Helpers.ps1" }      catch { Write-Host "ERR Helpers: `$_" -ForegroundColor Red }
-try { . "`$tmp\src\modules\Optimization.ps1" } catch { Write-Host "ERR Opt: `$_" -ForegroundColor Red }
-try { . "`$tmp\src\modules\Gaming.ps1" }     catch { Write-Host "ERR Gaming: `$_" -ForegroundColor Red }
-try { . "`$tmp\src\modules\Privacy.ps1" }    catch { Write-Host "ERR Privacy: `$_" -ForegroundColor Red }
-try { . "`$tmp\src\modules\Network.ps1" }    catch { Write-Host "ERR Network: `$_" -ForegroundColor Red }
-try { . "`$tmp\src\modules\System.ps1" }     catch { Write-Host "ERR System: `$_" -ForegroundColor Red }
-try { . "`$tmp\src\modules\Advanced.ps1" }   catch { Write-Host "ERR Advanced: `$_" -ForegroundColor Red }
-try { . "`$tmp\src\modules\ProcessManager.ps1" } catch { Write-Host "ERR ProcMgr: `$_" -ForegroundColor Red }
-try { . "`$tmp\src\ui\Theme.ps1" }           catch { Write-Host "ERR Theme: `$_" -ForegroundColor Red }
-try { . "`$tmp\src\ui\MainWindow.ps1" }      catch { Write-Host "ERR MainWindow: `$_" -ForegroundColor Red }
-try { Start-SiencyWinOS }                    catch { Write-Host "ERR Launch: `$_" -ForegroundColor Red; Read-Host "Press Enter to exit" }
+. "`$tmp\src\utils\Logger.ps1"
+. "`$tmp\src\utils\Helpers.ps1"
+. "`$tmp\src\modules\Optimization.ps1"
+. "`$tmp\src\modules\Gaming.ps1"
+. "`$tmp\src\modules\Privacy.ps1"
+. "`$tmp\src\modules\Network.ps1"
+. "`$tmp\src\modules\System.ps1"
+. "`$tmp\src\modules\Advanced.ps1"
+. "`$tmp\src\modules\ProcessManager.ps1"
+. "`$tmp\src\modules\Security.ps1"
+. "`$tmp\src\modules\Repair.ps1"
+. "`$tmp\src\modules\Monitor.ps1"
+. "`$tmp\src\ui\Theme.ps1"
+. "`$tmp\src\ui\MainWindow.ps1"
+Start-SiencyWinOS
 "@
 
 $launchPath = "$tmp\launch.ps1"
 $launch | Out-File -FilePath $launchPath -Encoding UTF8 -Force
 
+# Desktop shortcut
+$shell = New-Object -ComObject WScript.Shell
+$sc = $shell.CreateShortcut("$env:USERPROFILE\Desktop\SiencyWinOS.lnk")
+$sc.TargetPath = "powershell.exe"
+$sc.Arguments  = "-NoProfile -ExecutionPolicy Bypass -STA -File `"$launchPath`""
+$sc.Description = "SiencyWinOS Optimizer"
+$sc.Save()
+
 Write-Host ""
-Write-Host "  [OK] All 14 modules downloaded!" -ForegroundColor Green
-Write-Host "  Launching GUI via STA process..." -ForegroundColor Green
+Write-Host "  [OK] All $total modules downloaded!" -ForegroundColor Green
+Write-Host "  Launching GUI..." -ForegroundColor Green
 Write-Host ""
 
-Start-Process powershell.exe `
-    -ArgumentList "-NoProfile -ExecutionPolicy Bypass -STA -File `"$launchPath`"" `
-    -Verb RunAs
+Start-Process powershell.exe -ArgumentList "-NoProfile -ExecutionPolicy Bypass -STA -File `"$launchPath`"" -Verb RunAs

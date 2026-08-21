@@ -12,6 +12,10 @@ $ScriptRoot = Split-Path -Parent $MyInvocation.MyCommand.Path
 . "$ScriptRoot\src\modules\Network.ps1"
 . "$ScriptRoot\src\modules\System.ps1"
 . "$ScriptRoot\src\modules\Advanced.ps1"
+. "$ScriptRoot\src\modules\ProcessManager.ps1"
+. "$ScriptRoot\src\modules\Security.ps1"
+. "$ScriptRoot\src\modules\Repair.ps1"
+. "$ScriptRoot\src\modules\Monitor.ps1"
 . "$ScriptRoot\src\ui\Theme.ps1"
 . "$ScriptRoot\src\ui\MainWindow.ps1"
 Start-SiencyWinOS
